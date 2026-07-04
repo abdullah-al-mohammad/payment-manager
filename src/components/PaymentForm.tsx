@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Save, CalendarClock } from 'lucide-react';
-import { PaymentRecord, PAYMENT_METHODS, EXPENSE_CATEGORIES } from '../types';
+import { CalendarClock, Plus, Save } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { dateToMonthName } from '../lib/sheets';
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, PaymentRecord } from '../types';
 
 interface Props {
   editing: PaymentRecord | null;
   editingSheet: string;
-  onSave: (record: Omit<PaymentRecord, 'rowIndex'>, editRowIndex?: number, editSheet?: string) => Promise<void>;
+  onSave: (
+    record: Omit<PaymentRecord, 'rowIndex'>,
+    editRowIndex?: number,
+    editSheet?: string
+  ) => Promise<void>;
   onCancelEdit: () => void;
 }
 
@@ -46,7 +50,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
   }, [editing]);
 
   const set = useCallback((key: keyof typeof form, value: string) => {
-    setForm((f) => ({ ...f, [key]: value }));
+    setForm(f => ({ ...f, [key]: value }));
   }, []);
 
   const reset = () => setForm(emptyForm);
@@ -60,7 +64,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
     const store = [form.storeName.trim(), form.storeId.trim()].filter(Boolean).join(' / ');
     const amount = parseFloat(form.amount) || 0;
 
-    if (!form.date || !store || !amount || !form.method) {
+    if (!form.date || !store || !form.method) {
       return;
     }
 
@@ -105,7 +109,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         <input
           type="date"
           value={form.date}
-          onChange={(e) => set('date', e.target.value)}
+          onChange={e => set('date', e.target.value)}
           className={inputCls}
         />
       </div>
@@ -123,7 +127,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
           <input
             type="text"
             value={form.storeName}
-            onChange={(e) => set('storeName', e.target.value)}
+            onChange={e => set('storeName', e.target.value)}
             placeholder="e.g. Daraz"
             className={inputCls}
           />
@@ -133,7 +137,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
           <input
             type="text"
             value={form.storeId}
-            onChange={(e) => set('storeId', e.target.value)}
+            onChange={e => set('storeId', e.target.value)}
             placeholder="STR-001"
             className={inputCls}
           />
@@ -144,11 +148,13 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Amount (৳)</label>
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">৳</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">
+              ৳
+            </span>
             <input
               type="number"
               value={form.amount}
-              onChange={(e) => set('amount', e.target.value)}
+              onChange={e => set('amount', e.target.value)}
               placeholder="0.00"
               step="0.01"
               min="0"
@@ -157,13 +163,15 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
           </div>
         </div>
         <div className="flex-1 flex flex-col gap-1">
-          <label className="text-[11.5px] font-medium text-muted">Due / Balance (৳)</label>
+          <label className="text-[11.5px] font-medium text-muted">Expense / Balance (৳)</label>
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">৳</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">
+              ৳
+            </span>
             <input
               type="number"
               value={form.due}
-              onChange={(e) => set('due', e.target.value)}
+              onChange={e => set('due', e.target.value)}
               placeholder="0.00"
               step="0.01"
               min="0"
@@ -177,11 +185,13 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Company Amount (৳)</label>
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">৳</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">
+              ৳
+            </span>
             <input
               type="number"
               value={form.companyAmount}
-              onChange={(e) => set('companyAmount', e.target.value)}
+              onChange={e => set('companyAmount', e.target.value)}
               placeholder="0.00"
               step="0.01"
               min="0"
@@ -192,11 +202,13 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Rider Amount (৳)</label>
           <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">৳</span>
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">
+              ৳
+            </span>
             <input
               type="number"
               value={form.riderAmount}
-              onChange={(e) => set('riderAmount', e.target.value)}
+              onChange={e => set('riderAmount', e.target.value)}
               placeholder="0.00"
               step="0.01"
               min="0"
@@ -208,20 +220,32 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
 
       <div className="flex flex-col gap-1">
         <label className="text-[11.5px] font-medium text-muted">Payment Method</label>
-        <select value={form.method} onChange={(e) => set('method', e.target.value)} className={inputCls}>
+        <select
+          value={form.method}
+          onChange={e => set('method', e.target.value)}
+          className={inputCls}
+        >
           <option value="">Select method…</option>
-          {PAYMENT_METHODS.map((m) => (
-            <option key={m} value={m}>{m}</option>
+          {PAYMENT_METHODS.map(m => (
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="flex flex-col gap-1">
         <label className="text-[11.5px] font-medium text-muted">Expense Category</label>
-        <select value={form.expense} onChange={(e) => set('expense', e.target.value)} className={inputCls}>
+        <select
+          value={form.expense}
+          onChange={e => set('expense', e.target.value)}
+          className={inputCls}
+        >
           <option value="">Select category…</option>
-          {EXPENSE_CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+          {EXPENSE_CATEGORIES.map(c => (
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
       </div>
@@ -230,7 +254,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         <label className="text-[11.5px] font-medium text-muted">Remarks</label>
         <textarea
           value={form.remarks}
-          onChange={(e) => set('remarks', e.target.value)}
+          onChange={e => set('remarks', e.target.value)}
           placeholder="Optional notes…"
           rows={3}
           className={`${inputCls} resize-y min-h-[60px]`}
