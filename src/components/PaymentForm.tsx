@@ -1,7 +1,7 @@
 import { CalendarClock, Plus, Save } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { dateToMonthName } from '../lib/sheets';
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS, PaymentRecord } from '../types';
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, PaymentRecord, STORE_NAME } from '../types';
 
 interface Props {
   editing: PaymentRecord | null;
@@ -124,13 +124,18 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
       <div className="flex gap-2">
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Store Name</label>
-          <input
-            type="text"
+          <select
             value={form.storeName}
             onChange={e => set('storeName', e.target.value)}
-            placeholder="e.g. Daraz"
             className={inputCls}
-          />
+          >
+            <option value="">Select Store Name…</option>
+            {STORE_NAME.map(s => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Store ID</label>

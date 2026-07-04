@@ -1,7 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { Search, RefreshCw, Inbox, AlertTriangle, Edit2, Trash2, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react';
-import { PaymentRecord, SortField, SortDir, PAYMENT_METHODS, EXPENSE_CATEGORIES } from '../types';
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Edit2,
+  Inbox,
+  RefreshCw,
+  Search,
+  Trash2,
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { formatAmount } from '../lib/sheets';
+import { EXPENSE_CATEGORIES, PAYMENT_METHODS, PaymentRecord, SortDir, SortField } from '../types';
 import MethodBadge from './MethodBadge';
 
 interface Props {
@@ -20,7 +31,16 @@ interface Props {
 const PER_PAGE = 20;
 
 export default function PaymentTable({
-  records, activeSheet, loading, error, lastSync, onRefresh, onEdit, onDelete, onToggleReceived, isAdmin,
+  records,
+  activeSheet,
+  loading,
+  error,
+  lastSync,
+  onRefresh,
+  onEdit,
+  onDelete,
+  onToggleReceived,
+  isAdmin,
 }: Props) {
   const [search, setSearch] = useState('');
   const [methodFilter, setMethodFilter] = useState('');
@@ -32,9 +52,10 @@ export default function PaymentTable({
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return records.filter((r) => {
-      const matchQ = !q || [r.store, r.method, r.expense, r.remarks, r.date]
-        .some((v) => v.toLowerCase().includes(q));
+    return records.filter(r => {
+      const matchQ =
+        !q ||
+        [r.store, r.method, r.expense, r.remarks, r.date].some(v => v.toLowerCase().includes(q));
       const matchM = !methodFilter || r.method === methodFilter;
       const matchE = !expenseFilter || r.expense === expenseFilter;
       return matchQ && matchM && matchE;
@@ -56,13 +77,20 @@ export default function PaymentTable({
   const pageRows = sorted.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
 
   const handleSort = (field: SortField) => {
-    if (sortField === field) setSortDir((d) => (d === 1 ? -1 : 1) as SortDir);
-    else { setSortField(field); setSortDir(-1); }
+    if (sortField === field) setSortDir(d => (d === 1 ? -1 : 1) as SortDir);
+    else {
+      setSortField(field);
+      setSortDir(-1);
+    }
   };
 
   const SortArrow = ({ field }: { field: SortField }) =>
     sortField === field ? (
-      sortDir === 1 ? <ArrowUp size={11} className="inline text-teal ml-1" /> : <ArrowDown size={11} className="inline text-teal ml-1" />
+      sortDir === 1 ? (
+        <ArrowUp size={11} className="inline text-teal ml-1" />
+      ) : (
+        <ArrowDown size={11} className="inline text-teal ml-1" />
+      )
     ) : null;
 
   const th = (field: SortField, label: string) => (
@@ -70,7 +98,8 @@ export default function PaymentTable({
       onClick={() => handleSort(field)}
       className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide whitespace-nowrap cursor-pointer select-none hover:text-teal transition-colors"
     >
-      {label}<SortArrow field={field} />
+      {label}
+      <SortArrow field={field} />
     </th>
   );
 
@@ -83,26 +112,39 @@ export default function PaymentTable({
           <input
             type="text"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={e => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             placeholder="Search store, method, expense, remarks…"
             className="w-full bg-card border border-border rounded-md py-1.5 pl-[30px] pr-2.5 text-[13px] outline-none focus:border-teal transition-colors"
           />
         </div>
         <select
           value={methodFilter}
-          onChange={(e) => { setMethodFilter(e.target.value); setPage(1); }}
+          onChange={e => {
+            setMethodFilter(e.target.value);
+            setPage(1);
+          }}
           className="bg-card border border-border rounded-md px-2.5 py-1.5 text-muted text-[12.5px] cursor-pointer outline-none"
         >
           <option value="">All methods</option>
-          {PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}
+          {PAYMENT_METHODS.map(m => (
+            <option key={m}>{m}</option>
+          ))}
         </select>
         <select
           value={expenseFilter}
-          onChange={(e) => { setExpenseFilter(e.target.value); setPage(1); }}
+          onChange={e => {
+            setExpenseFilter(e.target.value);
+            setPage(1);
+          }}
           className="bg-card border border-border rounded-md px-2.5 py-1.5 text-muted text-[12.5px] cursor-pointer outline-none"
         >
           <option value="">All categories</option>
-          {EXPENSE_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          {EXPENSE_CATEGORIES.map(c => (
+            <option key={c}>{c}</option>
+          ))}
         </select>
         <button
           onClick={onRefresh}
@@ -116,7 +158,8 @@ export default function PaymentTable({
       <div className="flex items-center justify-between text-[11.5px] text-faint">
         <span>
           {sorted.length} record{sorted.length !== 1 ? 's' : ''}
-          {sorted.length < records.length ? ` (filtered from ${records.length})` : ''} · {activeSheet}
+          {sorted.length < records.length ? ` (filtered from ${records.length})` : ''} ·{' '}
+          {activeSheet}
         </span>
         <span>Synced: {lastSync ? lastSync.toLocaleTimeString() : '—'}</span>
       </div>
@@ -129,71 +172,116 @@ export default function PaymentTable({
               {th('date', 'Date')}
               {th('store', 'Store')}
               {th('amount', 'Amount')}
-              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Method</th>
-              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Expense</th>
+              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Method
+              </th>
+              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Expense
+              </th>
               {th('due', 'Due')}
-              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Company</th>
-              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Rider</th>
-              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Remarks</th>
-              <th className="px-3.5 py-2.5 text-center text-[10.5px] font-semibold text-faint uppercase tracking-wide">Received</th>
-              {isAdmin && <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">Actions</th>}
+              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Company
+              </th>
+              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Rider
+              </th>
+              <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Remarks
+              </th>
+              <th className="px-3.5 py-2.5 text-center text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                Received
+              </th>
+              {isAdmin && (
+                <th className="px-3.5 py-2.5 text-left text-[10.5px] font-semibold text-faint uppercase tracking-wide">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={totalCols}>
-                <div className="text-center py-14 text-faint">
-                  <div className="w-8 h-8 border-[3px] border-border border-t-teal rounded-full animate-spin mx-auto mb-3" />
-                  <p>Loading records…</p>
-                </div>
-              </td></tr>
+              <tr>
+                <td colSpan={totalCols}>
+                  <div className="text-center py-14 text-faint">
+                    <div className="w-8 h-8 border-[3px] border-border border-t-teal rounded-full animate-spin mx-auto mb-3" />
+                    <p>Loading records…</p>
+                  </div>
+                </td>
+              </tr>
             ) : error ? (
-              <tr><td colSpan={totalCols}>
-                <div className="text-center py-14 text-faint">
-                  <AlertTriangle size={42} className="mx-auto mb-3 text-rose" />
-                  <h3 className="text-[15px] text-rose mb-1">Failed to load</h3>
-                  <p>{error}</p>
-                </div>
-              </td></tr>
+              <tr>
+                <td colSpan={totalCols}>
+                  <div className="text-center py-14 text-faint">
+                    <AlertTriangle size={42} className="mx-auto mb-3 text-rose" />
+                    <h3 className="text-[15px] text-rose mb-1">Failed to load</h3>
+                    <p>{error}</p>
+                  </div>
+                </td>
+              </tr>
             ) : pageRows.length === 0 ? (
-              <tr><td colSpan={totalCols}>
-                <div className="text-center py-14 text-faint">
-                  <Inbox size={42} className="mx-auto mb-3" />
-                  <h3 className="text-[15px] text-muted mb-1">
-                    {records.length ? 'No matching records' : 'No records this month'}
-                  </h3>
-                  <p>{records.length ? 'Clear your search filters' : 'Add a payment using the form on the left'}</p>
-                </div>
-              </td></tr>
+              <tr>
+                <td colSpan={totalCols}>
+                  <div className="text-center py-14 text-faint">
+                    <Inbox size={42} className="mx-auto mb-3" />
+                    <h3 className="text-[15px] text-muted mb-1">
+                      {records.length ? 'No matching records' : 'No records this month'}
+                    </h3>
+                    <p>
+                      {records.length
+                        ? 'Clear your search filters'
+                        : 'Add a payment using the form on the left'}
+                    </p>
+                  </div>
+                </td>
+              </tr>
             ) : (
-              pageRows.map((r) => (
+              pageRows.map(r => (
                 <tr
                   key={r.rowIndex}
                   className={`border-t border-border transition-colors ${
-                    r.received
-                      ? 'bg-emerald/5 hover:bg-emerald/10'
-                      : 'hover:bg-card-hi'
+                    r.received ? 'bg-emerald/5 hover:bg-emerald/10' : 'hover:bg-card-hi'
                   }`}
                 >
-                  <td className={`px-3.5 py-2.5 text-[12px] font-mono ${r.received ? 'line-through text-faint' : 'text-muted'}`}>{r.date}</td>
+                  <td
+                    className={`px-3.5 py-2.5 text-[12px] font-mono ${r.received ? 'line-through text-faint' : 'text-muted'}`}
+                  >
+                    {r.date}
+                  </td>
                   <td className={`px-3.5 py-2.5 ${r.received ? 'line-through text-faint' : ''}`}>
                     <span className="font-medium">{r.store}</span>
                   </td>
-                  <td className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}>
+                  <td
+                    className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}
+                  >
                     ৳{formatAmount(r.amount)}
                   </td>
-                  <td className="px-3.5 py-2.5"><MethodBadge method={r.method} /></td>
-                  <td className={`px-3.5 py-2.5 text-[12px] ${r.received ? 'line-through text-faint' : 'text-muted'}`}>{r.expense}</td>
-                  <td className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : r.due > 0 ? 'text-amber' : 'text-emerald'}`}>
+                  <td className="px-3.5 py-2.5">
+                    <MethodBadge method={r.method} />
+                  </td>
+                  <td
+                    className={`px-3.5 py-2.5 text-[12px] ${r.received ? 'line-through text-faint' : 'text-muted'}`}
+                  >
+                    {r.expense}
+                  </td>
+                  <td
+                    className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : r.due > 0 ? 'text-amber' : 'text-emerald'}`}
+                  >
                     ৳{formatAmount(r.due)}
                   </td>
-                  <td className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}>
+                  <td
+                    className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}
+                  >
                     ৳{formatAmount(r.companyAmount ?? 0)}
                   </td>
-                  <td className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}>
+                  <td
+                    className={`px-3.5 py-2.5 font-mono font-semibold ${r.received ? 'line-through text-faint' : 'text-teal'}`}
+                  >
                     ৳{formatAmount(r.riderAmount ?? 0)}
                   </td>
-                  <td className={`px-3.5 py-2.5 text-[12px] max-w-[130px] truncate ${r.received ? 'line-through text-faint' : 'text-muted'}`} title={r.remarks}>
+                  <td
+                    className={`px-3.5 py-2.5 text-[12px] max-w-[130px] truncate ${r.received ? 'line-through text-faint' : 'text-muted'}`}
+                    title={r.remarks}
+                  >
                     {r.remarks || '—'}
                   </td>
 
@@ -204,7 +292,7 @@ export default function PaymentTable({
                         <input
                           type="checkbox"
                           checked={r.received}
-                          onChange={(e) => {
+                          onChange={e => {
                             const val = e.target.checked;
                             if (val) {
                               const ok = window.confirm(
@@ -220,14 +308,21 @@ export default function PaymentTable({
                           }}
                           className="sr-only peer"
                         />
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
-                          ${r.received
-                            ? 'bg-emerald border-emerald'
-                            : 'border-border group-hover:border-emerald bg-transparent'
+                        <div
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                          ${
+                            r.received
+                              ? 'bg-emerald border-emerald'
+                              : 'border-border group-hover:border-emerald bg-transparent'
                           }`}
                         >
                           {r.received && (
-                            <svg viewBox="0 0 10 8" className="w-3 h-3 text-bg fill-none stroke-current stroke-[2]" strokeLinecap="round" strokeLinejoin="round">
+                            <svg
+                              viewBox="0 0 10 8"
+                              className="w-3 h-3 text-bg fill-none stroke-current stroke-[2]"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
                               <path d="M1 4l2.5 2.5L9 1" />
                             </svg>
                           )}
@@ -235,14 +330,21 @@ export default function PaymentTable({
                       </label>
                     ) : (
                       <div className="inline-flex items-center justify-center">
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
-                          ${r.received
-                            ? 'bg-emerald border-emerald'
-                            : 'border-border bg-transparent'
+                        <div
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                          ${
+                            r.received
+                              ? 'bg-emerald border-emerald'
+                              : 'border-border bg-transparent'
                           }`}
                         >
                           {r.received && (
-                            <svg viewBox="0 0 10 8" className="w-3 h-3 text-bg fill-none stroke-current stroke-[2]" strokeLinecap="round" strokeLinejoin="round">
+                            <svg
+                              viewBox="0 0 10 8"
+                              className="w-3 h-3 text-bg fill-none stroke-current stroke-[2]"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
                               <path d="M1 4l2.5 2.5L9 1" />
                             </svg>
                           )}
@@ -289,16 +391,16 @@ export default function PaymentTable({
             <ChevronLeft size={14} />
           </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 2)
+            .filter(p => p === 1 || p === totalPages || Math.abs(p - safePage) <= 2)
             .map((p, idx, arr) => (
               <React.Fragment key={p}>
-                {idx > 0 && arr[idx - 1] !== p - 1 && (
-                  <span className="text-faint px-1">…</span>
-                )}
+                {idx > 0 && arr[idx - 1] !== p - 1 && <span className="text-faint px-1">…</span>}
                 <button
                   onClick={() => setPage(p)}
                   className={`w-[30px] h-[30px] border rounded-md text-[12.5px] flex items-center justify-center transition-colors ${
-                    p === safePage ? 'border-teal text-teal bg-teal-dim' : 'bg-card border-border text-muted hover:border-teal hover:text-teal'
+                    p === safePage
+                      ? 'border-teal text-teal bg-teal-dim'
+                      : 'bg-card border-border text-muted hover:border-teal hover:text-teal'
                   }`}
                 >
                   {p}
