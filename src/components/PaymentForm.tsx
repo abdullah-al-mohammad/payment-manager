@@ -64,7 +64,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
     const store = [form.storeName.trim(), form.storeId.trim()].filter(Boolean).join(' / ');
     const amount = parseFloat(form.amount) || 0;
 
-    if (!form.date || !store || !form.method) {
+    if (!form.date) {
       return;
     }
 

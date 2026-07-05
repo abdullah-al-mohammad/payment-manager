@@ -14,24 +14,60 @@ export default function StatsBar({ records }: Props) {
 
   const rider = records.reduce((s, r) => s + (r.riderAmount ?? 0), 0);
 
-  // Cash Paid = Amount - Due
-  const cashPaid = records
-    .filter(r => r.method === 'Cash')
-    .reduce((s, r) => s + (r.amount - r.due), 0);
-
-  // Online Paid (bKash, Nagad, Rocket, Bank)
+  // Online Payments
   const onlinePaid = records
     .filter(r => ['bKash', 'Nagad', 'Rocket', 'Bank'].includes(r.method))
     .reduce((s, r) => s + r.amount, 0);
 
+  // Cash Expense
+  const cashExpense = records
+    .filter(r => r.method === 'Cash' && r.expense && r.expense.trim() !== '')
+    .reduce((s, r) => s + r.amount, 0);
+
+  // Cash Paid / Cash Balance
+  const cashPaid = total - due - cashExpense - onlinePaid;
+
   const stats = [
-    { label: 'Total Amount', value: `৳${formatAmount(total)}`, color: 'text-teal' },
-    { label: 'Outstanding Expense', value: `৳${formatAmount(due)}`, color: 'text-amber' },
-    { label: 'Cash Paid', value: `৳${formatAmount(cashPaid)}`, color: 'text-emerald' },
-    { label: 'Online Paid', value: `৳${formatAmount(onlinePaid)}`, color: 'text-sky' },
-    { label: 'Total Company', value: `৳${formatAmount(company)}`, color: 'text-teal' },
-    { label: 'Total Rider', value: `৳${formatAmount(rider)}`, color: 'text-teal' },
-    { label: 'Records', value: String(records.length), color: 'text-slate-100' },
+    {
+      label: 'Total Amount',
+      value: `৳${formatAmount(total)}`,
+      color: 'text-teal',
+    },
+    {
+      label: 'Cash Balance',
+      value: `৳${formatAmount(cashPaid)}`,
+      color: 'text-emerald',
+    },
+    {
+      label: 'Online Paid',
+      value: `৳${formatAmount(onlinePaid)}`,
+      color: 'text-sky',
+    },
+    {
+      label: 'Cash Expense',
+      value: `৳${formatAmount(cashExpense)}`,
+      color: 'text-rose',
+    },
+    {
+      label: 'Outstanding Due',
+      value: `৳${formatAmount(due)}`,
+      color: 'text-amber',
+    },
+    {
+      label: 'Total Company',
+      value: `৳${formatAmount(company)}`,
+      color: 'text-teal',
+    },
+    {
+      label: 'Total Rider',
+      value: `৳${formatAmount(rider)}`,
+      color: 'text-teal',
+    },
+    {
+      label: 'Records',
+      value: String(records.length),
+      color: 'text-slate-100',
+    },
   ];
 
   return (
