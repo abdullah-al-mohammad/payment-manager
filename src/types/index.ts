@@ -45,16 +45,7 @@ export interface ApiResponse<T = unknown> {
 
 export const PAYMENT_METHODS = ['Cash', 'bKash', 'Nagad', 'Rocket'] as const;
 
-export const EXPENSE_CATEGORIES = [
-  'Inventory',
-  'Salary',
-  'Rent',
-  'Utilities',
-  'Marketing',
-  'Logistics',
-  'Maintenance',
-  'Miscellaneous',
-] as const;
+export const EXPENSE_CATEGORIES = ['fuel', 'bajar', 'rent', 'buy parcel', 'other'] as const;
 export const STORE_NAME = [
   'Heshel Cafe',
   'Fif Restaurant',
