@@ -6,37 +6,81 @@ interface Props {
 }
 
 export default function StatsBar({ records }: Props) {
-  const total = records.reduce((s, r) => s + r.amount, 0);
+  // const total = records.reduce((sum, r) => sum + r.amount, 0);
 
-  const due = records.reduce((s, r) => s + r.due, 0);
+  // const due = records.reduce((sum, r) => sum + r.due, 0);
 
-  const company = records.reduce((s, r) => s + (r.companyAmount ?? 0), 0);
+  // const company = records.reduce((sum, r) => sum + (r.companyAmount ?? 0), 0);
 
-  const rider = records.reduce((s, r) => s + (r.riderAmount ?? 0), 0);
+  // const rider = records.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
 
-  // Online Payments
-  const onlinePaid = records
-    .filter(r => ['bKash', 'Nagad', 'Rocket', 'Bank'].includes(r.method))
-    .reduce((s, r) => s + r.amount, 0);
+  // let handCash = 0;
+  // let totalCash = 0;
+  // let onlinePaid = 0;
+  // let cashExpense = 0;
 
-  // Cash Expense
-  const cashExpense = records
-    .filter(r => r.method === 'Cash' && r.expense && r.expense.trim() !== '')
-    .reduce((s, r) => s + r.amount, 0);
+  // records.forEach(r => {
+  //   switch (r.transactionType) {
+  //     case 'Collection':
+  //       totalCash += r.amount;
 
-  // Cash Paid / Cash Balance
-  const cashPaid = total - due - cashExpense - onlinePaid;
+  //       if (r.method === 'Cash') {
+  //         handCash += r.amount;
+  //       }
+  //       break;
+
+  //     case 'Expense':
+  //       totalCash += r.amount;
+  //       handCash += r.amount - r.due;
+  //       cashExpense += r.due;
+  //       break;
+
+  //     case 'Transfer':
+  //       totalCash += r.amount;
+  //       handCash -= r.amount;
+  //       onlinePaid += r.amount;
+  //       break;
+  //   }
+  // });
+  const due     = records.reduce((sum, r) => sum + r.due, 0);
+  const company = records.reduce((sum, r) => sum + (r.companyAmount ?? 0), 0);
+  const rider   = records.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
+
+  let handCash  = 0;
+  let onlinePaid = 0;
+  let cashExpense = 0;
+
+  records.forEach(r => {
+    const isOnline = ['bKash', 'Nagad', 'Rocket', 'Bank'].includes(r.method);
+
+    // 1. Accumulate collections based on payment method
+    if (isOnline) {
+      onlinePaid += r.amount;
+    } else if (r.method === 'Cash') {
+      handCash += r.amount;
+    }
+
+    // 2. Deduct expenses from Hand Cash first (and add to cashExpense)
+    // An expense is either a parcelCost or a standalone/order expense recorded in r.due
+    const expenseAmt = (r.expense ? r.due : 0) + (r.parcelCost ?? 0);
+    handCash -= expenseAmt;
+    cashExpense += expenseAmt;
+  });
+
+  // Total Cash = Hand Cash + Online — always the true net position.
+  // (parcel costs reduce handCash, so they are already excluded here)
+  const totalCash = handCash + onlinePaid;
 
   const stats = [
     {
-      label: 'Total Amount',
-      value: `৳${formatAmount(total)}`,
-      color: 'text-teal',
+      label: 'Total Cash',
+      value: `৳${formatAmount(totalCash)}`,
+      color: 'text-cyan',
     },
     {
-      label: 'Cash Balance',
-      value: `৳${formatAmount(cashPaid)}`,
-      color: 'text-emerald',
+      label: 'Hand Cash',
+      value: `৳${formatAmount(handCash)}`,
+      color: handCash >= 0 ? 'text-emerald' : 'text-rose',
     },
     {
       label: 'Online Paid',
@@ -49,9 +93,9 @@ export default function StatsBar({ records }: Props) {
       color: 'text-rose',
     },
     {
-      label: 'Outstanding Due',
+      label: 'Total Expense',
       value: `৳${formatAmount(due)}`,
-      color: 'text-amber',
+      color: 'text-rose',
     },
     {
       label: 'Total Company',

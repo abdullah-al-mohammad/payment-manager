@@ -20,6 +20,7 @@ const emptyForm = {
   storeId: '',
   amount: '',
   due: '',
+  parcelCost: '',
   companyAmount: '',
   riderAmount: '',
   method: '',
@@ -30,6 +31,17 @@ const emptyForm = {
 export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdit }: Props) {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const amount = parseFloat(form.amount) || 0;
+
+  let transactionType: 'Collection' | 'Expense' | 'Transfer' = 'Collection';
+
+  if (form.expense) {
+    if (['bKash', 'Nagad', 'Rocket', 'Bank'].includes(form.method)) {
+      transactionType = 'Transfer';
+    } else {
+      transactionType = 'Expense';
+    }
+  }
 
   useEffect(() => {
     if (editing) {
@@ -40,6 +52,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         storeId: storeId || '',
         amount: String(editing.amount),
         due: String(editing.due),
+        parcelCost: String(editing.parcelCost ?? ''),
         companyAmount: String(editing.companyAmount ?? ''),
         riderAmount: String(editing.riderAmount ?? ''),
         method: editing.method,
@@ -60,11 +73,23 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
     onCancelEdit();
   };
 
+  const parcelCostVal = parseFloat(form.parcelCost) || 0;
+  const isOnlineMethod = ['bKash', 'Nagad', 'Rocket', 'Bank'].includes(form.method);
+
+  // Contextual cash flow hint
+  const parcelHint = (() => {
+    if (!parcelCostVal || !form.method) return null;
+    if (isOnlineMethod) {
+      return `৳${parcelCostVal} deducted from Hand Cash → transferred to Online`;
+    }
+    return `৳${parcelCostVal} will be recorded as Cash Expense`;
+  })();
+
   const handleSubmit = async () => {
     const store = [form.storeName.trim(), form.storeId.trim()].filter(Boolean).join(' / ');
     const amount = parseFloat(form.amount) || 0;
 
-    if (!form.date) {
+    if (!form.date || !form.method) {
       return;
     }
 
@@ -77,7 +102,9 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
           amount,
           method: form.method,
           expense: form.expense,
+          transactionType,
           due: parseFloat(form.due) || 0,
+          parcelCost: parcelCostVal,
           companyAmount: parseFloat(form.companyAmount) || 0,
           riderAmount: parseFloat(form.riderAmount) || 0,
           remarks: form.remarks.trim(),
@@ -186,6 +213,31 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         </div>
       </div>
 
+      {/* Parcel Cost */}
+      <div className="flex flex-col gap-1">
+        <label className="text-[11.5px] font-medium text-muted">Parcel Cost (৳)</label>
+        <div className="relative">
+          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-faint font-mono text-[12px] pointer-events-none">
+            ৳
+          </span>
+          <input
+            type="number"
+            value={form.parcelCost}
+            onChange={e => set('parcelCost', e.target.value)}
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            className={`${inputCls} pl-[22px] font-mono`}
+          />
+        </div>
+        {parcelHint && (
+          <div className="text-[11px] text-amber bg-amber/10 rounded-md px-2 py-1.5 flex items-start gap-1.5 mt-0.5">
+            <span className="mt-0.5">⚡</span>
+            <span>{parcelHint}</span>
+          </div>
+        )}
+      </div>
+
       <div className="flex gap-2">
         <div className="flex-1 flex flex-col gap-1">
           <label className="text-[11.5px] font-medium text-muted">Company Amount (৳)</label>
@@ -239,6 +291,19 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
         </select>
       </div>
 
+      {/* <div className="flex flex-col gap-1">
+        <label className="text-[11.5px] font-medium text-muted">Transaction Type</label>
+        <select
+          value={form.transactionType}
+          onChange={e => set('transactionType', e.target.value as TransactionType)}
+          className={inputCls}
+        >
+          <option value="Collection">Collection</option>
+          <option value="Expense">Expense</option>
+          <option value="Transfer">Transfer</option>
+        </select>
+      </div> */}
+
       <div className="flex flex-col gap-1">
         <label className="text-[11.5px] font-medium text-muted">Expense Category</label>
         <select
@@ -268,7 +333,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
 
       <button
         onClick={handleSubmit}
-        disabled={saving}
+        disabled={saving || !form.date || !form.method}
         className="w-full py-2.5 bg-teal text-bg rounded-lg font-bold text-[13.5px] flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <Save size={15} />

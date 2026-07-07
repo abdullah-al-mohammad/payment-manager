@@ -8,6 +8,8 @@ export interface PaymentRecord {
   due: number;
   companyAmount: number;
   riderAmount: number;
+  parcelCost: number;
+  transactionType: 'Collection' | 'Expense' | 'Transfer';
   remarks: string;
   received: boolean;
 }
@@ -41,16 +43,7 @@ export interface ApiResponse<T = unknown> {
   data?: T;
 }
 
-export const PAYMENT_METHODS = [
-  'Cash',
-  'Card',
-  'Bank Transfer',
-  'bKash',
-  'Nagad',
-  'Rocket',
-  'Cheque',
-  'Other',
-] as const;
+export const PAYMENT_METHODS = ['Cash', 'bKash', 'Nagad', 'Rocket'] as const;
 
 export const EXPENSE_CATEGORIES = [
   'Inventory',
