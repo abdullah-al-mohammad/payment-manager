@@ -37,6 +37,7 @@ export default function App() {
     setWebAppUrlState(url);
     setWebAppUrl(url);
   }, []);
+  const [currentTab, setCurrentTab] = useState<'new-payment' | 'records'>('new-payment');
 
   const handleSave = useCallback(async (
     record: Omit<PaymentRecord, 'rowIndex'>,
@@ -45,6 +46,7 @@ export default function App() {
   ) => {
     try {
       await saveRecord(record, editRowIndex, editSheet);
+      setCurrentTab('records');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Save failed');
       throw e;
@@ -54,13 +56,14 @@ export default function App() {
   const handleEdit = useCallback((rec: PaymentRecord) => {
     setEditing(rec);
     setEditingSheet(activeSheet);
+    setCurrentTab('new-payment');
   }, [activeSheet]);
 
   const handleCancelEdit = useCallback(() => {
     setEditing(null);
     setEditingSheet('');
+    setCurrentTab('records');
   }, []);
-
   const handleDelete = useCallback(async (rowIndex: number) => {
     const rec = records.find((r) => r.rowIndex === rowIndex);
     if (!rec) return;
@@ -131,6 +134,8 @@ export default function App() {
       <Header
         user={user}
         viewingEmail={viewingEmail}
+        currentTab={currentTab}
+        onChangeTab={setCurrentTab}
         onExport={handleExport}
         onLogout={handleLogout}
         onOpenAdmin={() => setAdminOpen(true)}
@@ -143,26 +148,34 @@ export default function App() {
         onSwitch={switchSheet}
       />
       <StatsBar records={records} />
-      <div className="flex flex-1 overflow-hidden">
-        <PaymentForm
-          editing={editing}
-          editingSheet={editingSheet}
-          onSave={handleSave}
-          onCancelEdit={handleCancelEdit}
-        />
-        <PaymentTable
-          records={records}
-          activeSheet={activeSheet}
-          loading={loadingRecords}
-          error={error}
-          lastSync={lastSync}
-          onRefresh={refresh}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleReceived={toggleReceivedRecord}
-          isAdmin={user.role === 'admin'}
-        />
-      </div>
+
+      {currentTab === 'new-payment' ? (
+        <div className="flex flex-1 overflow-hidden justify-center items-start py-8 px-4 overflow-y-auto">
+          <div className="w-full max-w-[420px] bg-surface border border-border rounded-xl p-6 shadow-xl">
+            <PaymentForm
+              editing={editing}
+              editingSheet={editingSheet}
+              onSave={handleSave}
+              onCancelEdit={handleCancelEdit}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          <PaymentTable
+            records={records}
+            activeSheet={activeSheet}
+            loading={loadingRecords}
+            error={error}
+            lastSync={lastSync}
+            onRefresh={refresh}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleReceived={toggleReceivedRecord}
+            isAdmin={user.role === 'admin'}
+          />
+        </div>
+      )}
 
       <AdminPanel
         open={adminOpen}

@@ -296,12 +296,12 @@ export default function PaymentTable({
                             const val = e.target.checked;
                             if (val) {
                               const ok = window.confirm(
-                                'Are you sure you want to mark this bill as received?\nThis will reset all related financial amounts (Amount, Due, Company, Rider) to 0.00 and log the collection to history.'
+                                'Are you sure you want to mark this bill as received?\nThis will log the collection to history.'
                               );
                               if (ok) onToggleReceived(r.rowIndex, true);
                             } else {
                               const ok = window.confirm(
-                                'Unmarking this bill as received will not restore its original financial amounts (they will remain 0.00).\nDo you want to proceed?'
+                                'Are you sure you want to unmark this bill as received?'
                               );
                               if (ok) onToggleReceived(r.rowIndex, false);
                             }

@@ -125,7 +125,7 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
     'w-full bg-card border border-border rounded-md px-2.5 py-2 text-[13px] outline-none transition-colors focus:border-teal focus:ring-[3px] focus:ring-teal-dim';
 
   return (
-    <aside className="w-[310px] min-w-[310px] bg-surface border-r border-border p-5 overflow-y-auto flex flex-col gap-3.5">
+    <div className="flex flex-col gap-3.5">
       <div className="text-[11px] font-semibold text-faint uppercase tracking-wide flex items-center gap-1.5 pb-2 border-b border-border">
         {editing ? <Save size={13} /> : <Plus size={13} />}
         <span>{editing ? 'Edit Payment' : 'New Payment'}</span>
@@ -348,6 +348,6 @@ export default function PaymentForm({ editing, editingSheet, onSave, onCancelEdi
           Cancel edit
         </button>
       )}
-    </aside>
+    </div>
   );
 }

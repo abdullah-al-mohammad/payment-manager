@@ -42,15 +42,16 @@ export default function StatsBar({ records }: Props) {
   //       break;
   //   }
   // });
-  const due     = records.reduce((sum, r) => sum + r.due, 0);
-  const company = records.reduce((sum, r) => sum + (r.companyAmount ?? 0), 0);
-  const rider   = records.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
+  const activeRecords = records.filter(r => !r.received);
+  const due     = activeRecords.reduce((sum, r) => sum + r.due, 0);
+  const company = activeRecords.reduce((sum, r) => sum + (r.companyAmount ?? 0), 0);
+  const rider   = activeRecords.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
 
   let handCash  = 0;
   let onlinePaid = 0;
   let cashExpense = 0;
 
-  records.forEach(r => {
+  activeRecords.forEach(r => {
     const isOnline = ['bKash', 'Nagad', 'Rocket', 'Bank'].includes(r.method);
 
     // 1. Accumulate collections based on payment method

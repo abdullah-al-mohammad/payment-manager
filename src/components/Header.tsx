@@ -1,17 +1,28 @@
 import React from 'react';
-import { Wallet2, Download, LogOut, ShieldCheck, Eye, X } from 'lucide-react';
+import { Wallet2, Download, LogOut, ShieldCheck, Eye, X, List, Plus } from 'lucide-react';
 import { AuthUser } from '../types';
 
 interface Props {
   user: AuthUser;
   viewingEmail?: string;
+  currentTab: 'new-payment' | 'records';
+  onChangeTab: (tab: 'new-payment' | 'records') => void;
   onExport: () => void;
   onLogout: () => void;
   onOpenAdmin: () => void;
   onStopViewing: () => void;
 }
 
-export default function Header({ user, viewingEmail, onExport, onLogout, onOpenAdmin, onStopViewing }: Props) {
+export default function Header({
+  user,
+  viewingEmail,
+  currentTab,
+  onChangeTab,
+  onExport,
+  onLogout,
+  onOpenAdmin,
+  onStopViewing,
+}: Props) {
   return (
     <header className="bg-surface border-b border-border sticky top-0 z-50">
       <div className="h-[52px] flex items-center px-5 gap-3">
@@ -29,6 +40,22 @@ export default function Header({ user, viewingEmail, onExport, onLogout, onOpenA
               <span className="text-[10px] text-amber bg-amber/10 rounded-full px-1.5 py-0.5">admin</span>
             )}
           </div>
+
+          {currentTab === 'new-payment' ? (
+            <button
+              onClick={() => onChangeTab('records')}
+              className="bg-teal text-bg border border-teal rounded-md font-bold px-2.5 py-1.5 text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+            >
+              <List size={14} /> View Records
+            </button>
+          ) : (
+            <button
+              onClick={() => onChangeTab('new-payment')}
+              className="bg-teal text-bg border border-teal rounded-md font-bold px-2.5 py-1.5 text-[12px] flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+            >
+              <Plus size={14} /> Add Payment
+            </button>
+          )}
 
           {user.role === 'admin' && (
             <button

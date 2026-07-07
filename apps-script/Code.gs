@@ -470,11 +470,7 @@ function toggleReceived(spreadsheetId, sheetName, rowIndex, received) {
     // Log to Collection History
     saveCollectionHistory(new Date(), totalCollected, details);
 
-    // Reset financial amounts to 0.00 and set Received to true
-    sheet.getRange(rowIndex, 3).setValue(0);
-    sheet.getRange(rowIndex, 6).setValue(0);
-    sheet.getRange(rowIndex, 7).setValue(0);
-    sheet.getRange(rowIndex, 8).setValue(0);
+    // Set Received to true and preserve original values
     sheet.getRange(rowIndex, 10).setValue(true);
   } else {
     sheet.getRange(rowIndex, 10).setValue(false);
