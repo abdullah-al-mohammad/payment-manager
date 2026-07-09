@@ -74,5 +74,6 @@ export const STORE_NAME = [
   'Fisher Village',
   'Bokkor Vaiyer Chotpoti',
   'Moha Raja Chotpoti',
+  'Haji Nanna Biriyani',
   'fatafat Custom order',
 ] as const;
