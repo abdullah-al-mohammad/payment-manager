@@ -43,11 +43,11 @@ export default function StatsBar({ records }: Props) {
   //   }
   // });
   const activeRecords = records.filter(r => !r.received);
-  const due     = activeRecords.reduce((sum, r) => sum + r.due, 0);
+  const due = activeRecords.reduce((sum, r) => sum + r.due, 0);
   const company = activeRecords.reduce((sum, r) => sum + (r.companyAmount ?? 0), 0);
-  const rider   = activeRecords.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
+  const rider = activeRecords.reduce((sum, r) => sum + (r.riderAmount ?? 0), 0);
 
-  let handCash  = 0;
+  let handCash = 0;
   let onlinePaid = 0;
   let cashExpense = 0;
 
@@ -63,7 +63,7 @@ export default function StatsBar({ records }: Props) {
 
     // 2. Deduct expenses from Hand Cash first (and add to cashExpense)
     // An expense is either a parcelCost or a standalone/order expense recorded in r.due
-    const expenseAmt = (r.expense ? r.due : 0) + (r.parcelCost ?? 0);
+    const expenseAmt = r.expense ? r.due : 0;
     handCash -= expenseAmt;
     cashExpense += expenseAmt;
   });
