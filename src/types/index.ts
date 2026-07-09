@@ -8,7 +8,6 @@ export interface PaymentRecord {
   due: number;
   companyAmount: number;
   riderAmount: number;
-  parcelCost: number;
   transactionType: 'Collection' | 'Expense' | 'Transfer';
   remarks: string;
   received: boolean;
